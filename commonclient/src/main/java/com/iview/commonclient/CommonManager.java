@@ -28,6 +28,18 @@ public class CommonManager {
     public static final int PROJECTOR_ON = 1;
     public static final int PROJECTOR_OFF = 0;
 
+    public static final int HEncoder = 1;
+    public static final int VEncoder = 0;
+
+    public static final float HEncoderPerPlus = 0.37f;
+    public static final float VEncoderPerPlus = 0.46f;
+
+    public final static Float H_DEGREE_P_STEP = 0.001232f;
+    public final static Float V_DEGREE_P_STEP = 0.001330f;
+
+    public static final int FOCUS_NEAR = 1;
+    public static final int FOCUS_FAR = 0;
+
     private ICommonService commonService;
 
     private static CommonManager commonManager;
@@ -125,6 +137,72 @@ public class CommonManager {
         return ret;
     }
 
+    public int controlMotor(int motorId, float degree, int dir, int delay, boolean bCheckLimitSwitch) {
+        int ret = -1;
+        int steps = 0;
+
+        try {
+            if (commonService != null) {
+                if (motorId == HMotor) {
+                    steps = (int) (degree / H_DEGREE_P_STEP);
+                    ret = commonService.controlHorizontalMotor(steps, dir, delay, bCheckLimitSwitch);
+                } else if (motorId == VMotor) {
+                    steps = (int) (degree / V_DEGREE_P_STEP);
+                    ret = commonService.controlVerticalMotor(steps, dir, delay, bCheckLimitSwitch);
+                }
+            } else {
+                Log.e(TAG, "commonService is null");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return ret;
+    }
+
+    public int controlMotorAsync(int motorId, int steps, int dir, int delay, boolean bCheckLimitSwitch) {
+        int ret = -1;
+
+        try {
+            if (commonService != null) {
+                if (motorId == HMotor) {
+                    ret = commonService.controlHorizontalMotorAsync(steps, dir, delay, bCheckLimitSwitch);
+                } else if (motorId == VMotor) {
+                    ret = commonService.controlVerticalMotorAsync(steps, dir, delay, bCheckLimitSwitch);
+                }
+            } else {
+                Log.e(TAG, "commonService is null");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return ret;
+    }
+
+    public int controlMotorAsync(int motorId, float degree, int dir, int delay, boolean bCheckLimitSwitch) {
+        int ret = -1;
+        int steps = 0;
+
+        try {
+            if (commonService != null) {
+                if (motorId == HMotor) {
+                    steps = (int) (degree / H_DEGREE_P_STEP);
+                    ret = commonService.controlHorizontalMotorAsync(steps, dir, delay, bCheckLimitSwitch);
+                } else if (motorId == VMotor) {
+                    steps = (int) (degree / V_DEGREE_P_STEP);
+                    ret = commonService.controlVerticalMotorAsync(steps, dir, delay, bCheckLimitSwitch);
+                }
+            } else {
+                Log.e(TAG, "commonService is null");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return ret;
+    }
+
     public int stopMotorRunning(int motorId) {
         int ret = -1;
         try {
@@ -138,6 +216,122 @@ public class CommonManager {
         }
 
         return ret;
+    }
+
+    /**
+     * 获取编码器的值
+     * @param encoderId 编码器id
+    {
+    @link HEncoder 水平方向编码器
+    @link VEncoder 垂直方向编码器
+    }
+     * @return int 编码器脉冲数
+     */
+    public int getEncoder(int encoderId) {
+        int ret = 0;
+        try {
+            if (commonService != null) {
+                ret = commonService.getEncoder(encoderId);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return ret;
+    }
+
+    public float getEncoderDegree(int encoderId) {
+        int pluses = getEncoder(encoderId);
+        float degree = 0.0f;
+
+        switch(encoderId) {
+            case HEncoder:
+                degree = pluses * HEncoderPerPlus;
+                break;
+            case VEncoder:
+                degree = pluses * VEncoderPerPlus;
+                break;
+        }
+
+        return degree;
+    }
+
+    /**
+     * 设置编码器的值
+     * @param encoderId 编码器id
+    {
+    @link HEncoder 水平方向编码器
+    @link VEncoder 垂直方向编码器
+    }
+     * @param value 编码器脉冲数
+     */
+    public void setEncoder(int encoderId, int value) {
+        try {
+            if (commonService != null) {
+                commonService.setEncoder(encoderId, value);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void controFocusMotor(int steps, int dir) {
+        Log.e(TAG, "controFocusMotor");
+        if (dir == FOCUS_NEAR || dir == FOCUS_FAR) {
+            try {
+                if (commonService != null) {
+
+                    commonService.controlFocusMotor(steps, dir);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.e(TAG, "controlFoucsMotor error dir:" + dir);
+        }
+    }
+
+    public void setKeystone(int angle) {
+        if (angle > 40 || angle < -40) {
+            Log.e(TAG, "setKeystone angle out of range");
+            return;
+        }
+
+        try {
+            if (commonService != null) {
+                commonService.setKeystone(angle);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void switchProjector(int enable) {
+        if (enable != 0 && enable != 1) {
+            Log.e(TAG, "switchProjector error");
+            return;
+        }
+
+        try {
+            if (commonService != null) {
+                commonService.switchProjector(enable);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getMotorSteps(int motorId) {
+        int steps = 0;
+        try {
+            if (commonService != null) {
+                steps = commonService.getMotorSteps(motorId);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return steps;
     }
 
     private class Client extends ICommonClient.Stub {

@@ -9,7 +9,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:directBootAware="true">
 
         <service android:name=".CommonService"
             android:enabled="true"
@@ -18,7 +19,7 @@
                 <action android:name="android.intent.action.CommonService"/>
             </intent-filter>
         </service>
-
+<!--
         <receiver android:name=".BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -26,7 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </receiver>
-
+-->
     </application>
 
 

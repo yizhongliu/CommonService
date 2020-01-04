@@ -39,6 +39,50 @@ public class CommonService extends Service {
 
             bHMotorRunning = true;
 
+            Log.e(TAG, "before handleLeftButton step:" + steps + ", delay:" + delay);
+            MotorControl.controlMotor(MotorControl.HMotor, steps, dir, delay, bCheckLimitSwitch);
+            Log.e(TAG, "after handleLeftButton step:" + steps + ", delay:" + delay + ",runningtime:" + steps * delay * 2);
+
+            bHMotorRunning = false;
+
+        //    commonClientCallback.onMotorStop(MotorControl.HMotor);
+
+            return 0;
+        }
+
+        @Override
+        public int controlVerticalMotor(final int steps,final int dir, final int delay, final boolean bCheckLimitSwitch) {
+            Log.d(TAG, "controlVerticalMotor");
+
+            if (bVMotorRunning) {
+                Log.e(TAG, "Vertical motor is running");
+                return -1;
+            }
+
+            bVMotorRunning = true;
+
+            Log.e(TAG, "before handleLeftButton step:" + steps + ", delay:" + delay);
+            MotorControl.controlMotor(MotorControl.VMotor, steps, dir, delay, bCheckLimitSwitch);
+            Log.e(TAG, "after handleLeftButton step:" + steps + ", delay:" + delay + ",runningtime:" + steps * delay * 2);
+
+            bVMotorRunning = false;
+
+            //commonClientCallback.onMotorStop(MotorControl.VMotor);
+
+            return 0;
+        }
+
+        @Override
+        public int controlHorizontalMotorAsync(final int steps, final int dir, final int delay, final boolean bCheckLimitSwitch) {
+            Log.d(TAG, "controlHorizontalMotor");
+
+            if (bHMotorRunning) {
+                Log.e(TAG, "Horizontal motor is running");
+                return -1;
+            }
+
+            bHMotorRunning = true;
+
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -55,7 +99,7 @@ public class CommonService extends Service {
         }
 
         @Override
-        public int controlVerticalMotor(final int steps,final int dir, final int delay, final boolean bCheckLimitSwitch) {
+        public int controlVerticalMotorAsync(final int steps,final int dir, final int delay, final boolean bCheckLimitSwitch) {
             Log.d(TAG, "controlVerticalMotor");
 
             if (bVMotorRunning) {
@@ -95,5 +139,37 @@ public class CommonService extends Service {
         public void removeClient(IBinder client) throws RemoteException {
             commonClientCallback.releaseClient(client);
         }
+
+        @Override
+        public void switchProjector(int enable) throws RemoteException {
+            MotorControl.swtichProjector(enable);
+        }
+
+        @Override
+        public void setKeystone(int angle) throws RemoteException {
+            MotorControl.setKeyStone(angle);
+        }
+
+        @Override
+        public void controlFocusMotor(int steps, int dir) throws RemoteException {
+            MotorControl.controlFocusMotor(steps, dir);
+        }
+
+        @Override
+        public int getMotorSteps(int motorId) throws RemoteException {
+            return MotorControl.getMotorSteps(motorId);
+        }
+
+
+        @Override
+        public int getEncoder(int encoderId) {
+            return MotorControl.getEncoderCount(encoderId);
+        }
+
+        @Override
+        public void setEncoder(int encoderId, int value) {
+            MotorControl.setEncoderCount(encoderId, value);
+        }
+
     };
 }
