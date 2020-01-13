@@ -2,9 +2,11 @@ package com.iview.commonservice;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import com.iview.commonclient.ICommonService;
 import com.iview.motor.MotorControl;
@@ -16,9 +18,41 @@ public class CommonService extends Service {
     private boolean bVMotorRunning = false;
 
     private CommonClientCallback commonClientCallback;
+    private KeyeventReceiver keyeventReceiver;
 
     public CommonService() {
         commonClientCallback = CommonClientCallback.getInstance();
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "onCreate");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        int result = super.onStartCommand(intent, flags, startId);
+        Log.d(TAG, "onStartCommand");
+
+        keyeventReceiver = new KeyeventReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.iview.commonservice.KeyEvent");
+        registerReceiver(keyeventReceiver, intentFilter);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MotorControl.controlFocusMotor(1000, 0);
+            }
+        }).start();
+
+        return result;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
