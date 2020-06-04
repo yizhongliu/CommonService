@@ -205,5 +205,65 @@ public class CommonService extends Service {
             MotorControl.setEncoderCount(encoderId, value);
         }
 
+        @Override
+        public int setMotorSpeed(int motorId, int delay) {
+            return MotorControl.setMotorSpeed(motorId, delay);
+        }
+
+        @Override
+        public int setMotorDirection(int motorId, int direction) {
+            return MotorControl.setMotorDirection(motorId, direction);
+        }
+
+        @Override
+        public int startHorizontalMotorRunning(final boolean bCheckLimitSwitch) {
+            Log.d(TAG, "startHorizontalMotorRunning");
+
+            if (bHMotorRunning) {
+                Log.e(TAG, "Horizontal motor is running");
+                return -1;
+            }
+
+            bHMotorRunning = true;
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    MotorControl.startMotorRunning(MotorControl.HMotor, bCheckLimitSwitch);
+
+                    bHMotorRunning = false;
+
+                    commonClientCallback.onMotorStop(MotorControl.HMotor);
+                }
+            }).start();
+            return 0;
+        }
+
+        @Override
+        public int startVerticalMotorRunning(final boolean bCheckLimitSwitch) {
+            Log.d(TAG, "controlVerticalMotor");
+
+            if (bVMotorRunning) {
+                Log.e(TAG, "Vertical motor is running");
+                return -1;
+            }
+
+            bVMotorRunning = true;
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    MotorControl.startMotorRunning(MotorControl.VMotor, bCheckLimitSwitch);
+
+                    bVMotorRunning = false;
+
+                    commonClientCallback.onMotorStop(MotorControl.VMotor);
+                }
+            }).start();
+            return 0;
+        }
+
     };
 }

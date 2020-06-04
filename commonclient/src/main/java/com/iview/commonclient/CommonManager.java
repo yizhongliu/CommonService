@@ -334,6 +334,52 @@ public class CommonManager {
         return steps;
     }
 
+    /*
+     * 以下几个接口有关联
+     * 先设置速度和方向, 再调用startMotorRunning 启动马达运动,如果不调用stopMotorRunning则一直运行
+     */
+    public void setMotorSpeed(int motorId, int delay) {
+        try {
+            if (commonService != null) {
+                commonService.setMotorSpeed(motorId, delay);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void setMotorDirection(int motorId, int direction) {
+        try {
+            if (commonService != null) {
+                commonService.setMotorDirection(motorId, direction);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int startMotorRunning(int motorId, boolean bCheckLimitSwitch) {
+        int ret = -1;
+
+        try {
+            if (commonService != null) {
+                if (motorId == HMotor) {
+                    ret = commonService.startHorizontalMotorRunning(bCheckLimitSwitch);
+                } else if (motorId == VMotor) {
+                    ret = commonService.startVerticalMotorRunning(bCheckLimitSwitch);
+                }
+            } else {
+                Log.e(TAG, "commonService is null");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return ret;
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
     private class Client extends ICommonClient.Stub {
 
         @Override

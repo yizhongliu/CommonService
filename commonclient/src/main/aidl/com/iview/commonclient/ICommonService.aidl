@@ -29,4 +29,15 @@ interface ICommonService {
     void controlFocusMotor(int steps, int dir);
 
     int getMotorSteps(int motorId);
+
+    //以下几个接口有关联
+    //先设置速度和方向, 再调用startMotorRunning 启动马达运动,如果不调用stopMotorRunning则一直运行
+    int setMotorSpeed(int motorId, int delay);
+
+    int setMotorDirection(int motorId, int direction);
+
+    int startHorizontalMotorRunning(boolean bCheckLimitSwitch);
+
+    int startVerticalMotorRunning(boolean bCheckLimitSwitch);
+    ///////////////////////////////////////////////////////////////////////
 }
