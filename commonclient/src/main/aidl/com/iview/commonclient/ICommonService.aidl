@@ -40,4 +40,12 @@ interface ICommonService {
 
     int startVerticalMotorRunning(boolean bCheckLimitSwitch);
     ///////////////////////////////////////////////////////////////////////
+
+    void setProjectionMode(int mode);
+
+    void setProjectorOnOff(int enable);
+
+
+    void setMotorSteps(int motorId, int steps);
+    int getPiState(int motorId, int direction);
 }

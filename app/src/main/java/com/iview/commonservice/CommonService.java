@@ -265,5 +265,30 @@ public class CommonService extends Service {
             return 0;
         }
 
+        @Override
+        public void setProjectionMode(int mode) {
+            if (mode >=0 && mode < 4) {
+                MotorControl.setProjectionMode(mode);
+            }
+        }
+
+        @Override
+        public void setProjectorOnOff(int enable) {
+            if (enable == MotorControl.POWER_OFF || enable == MotorControl.POWER_ON) {
+                MotorControl.setProjectorPower(enable);
+            }
+
+        }
+
+        @Override
+        public void setMotorSteps(int motorId, int steps) {
+            MotorControl.setMotorSteps(motorId, steps);
+        }
+
+        @Override
+        public int getPiState(int motorId, int direction) {
+            return MotorControl.getPiState(motorId, direction);
+        }
+
     };
 }

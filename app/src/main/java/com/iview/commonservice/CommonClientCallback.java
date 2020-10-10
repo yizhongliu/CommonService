@@ -59,20 +59,23 @@ public class CommonClientCallback implements CommonEventListener{
 
     @Override
     public void onMotorStop(int motorId) {
-        if (mCallbackList == null) {
-            return;
-        }
-
-        int count = mCallbackList.beginBroadcast();
-        while (count > 0) {
-            count--;
-            try {
-                mCallbackList.getBroadcastItem(count).onMotorStop(motorId);
-            } catch (RemoteException e) {
-                e.printStackTrace();
+        synchronized (CommonClientCallback.class) {
+            if (mCallbackList == null) {
+                return;
             }
+
+            int count = mCallbackList.beginBroadcast();
+            while (count > 0) {
+                count--;
+                try {
+                    mCallbackList.getBroadcastItem(count).onMotorStop(motorId);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            mCallbackList.finishBroadcast();
         }
 
-        mCallbackList.finishBroadcast();
     }
 }

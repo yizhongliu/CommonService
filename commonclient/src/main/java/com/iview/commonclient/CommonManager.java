@@ -40,6 +40,12 @@ public class CommonManager {
     public static final int FOCUS_NEAR = 1;
     public static final int FOCUS_FAR = 0;
 
+    public static final int PROJECTOR_POWER_ON = 1;
+    public static final int PROJECTOR_POWER_OFF = 0;
+
+    public static final int PI_STATE_TRIGER = 1;
+    public static final int PI_STATE_UNTRIGER = 0;
+
     private ICommonService commonService;
 
     private static CommonManager commonManager;
@@ -360,13 +366,16 @@ public class CommonManager {
     }
 
     public int startMotorRunning(int motorId, boolean bCheckLimitSwitch) {
+        Log.e(TAG, "startMotorRunning: motorId:" + motorId + ", bCheckLimitSwitch:" + bCheckLimitSwitch);
         int ret = -1;
 
         try {
             if (commonService != null) {
                 if (motorId == HMotor) {
+                    Log.e(TAG, "startMotorRunning: startHorizontalMotorRunning");
                     ret = commonService.startHorizontalMotorRunning(bCheckLimitSwitch);
                 } else if (motorId == VMotor) {
+                    Log.e(TAG, "startMotorRunning: startVerticalMotorRunning");
                     ret = commonService.startVerticalMotorRunning(bCheckLimitSwitch);
                 }
             } else {
@@ -377,6 +386,58 @@ public class CommonManager {
         }
 
         return ret;
+    }
+
+    public void setProjectorMode(int mode) {
+        try {
+            if (commonService != null) {
+                commonService.setProjectionMode(mode);
+            } else {
+                Log.e(TAG, "commonService is null");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setProjectorOnOff(int enable) {
+        try {
+            if (commonService != null) {
+                commonService.setProjectorOnOff(enable);
+            } else {
+                Log.e(TAG, "commonService is null");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setMotorSteps(int motorId, int motorSteps) {
+        try {
+            if (commonService != null) {
+                commonService.setMotorSteps(motorId, motorSteps);
+            } else {
+                Log.e(TAG, "commonService is null");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getPiState(int motorId, int direction) {
+        int ret = PI_STATE_UNTRIGER;
+        try {
+            if (commonService != null) {
+                ret = commonService.getPiState(motorId, direction);
+            } else {
+                Log.e(TAG, "commonService is null");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return ret;
+
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
